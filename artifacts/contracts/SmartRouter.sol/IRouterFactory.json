@@ -1,0 +1,33 @@
+{
+  "_format": "hh3-artifact-1",
+  "contractName": "IRouterFactory",
+  "sourceName": "contracts/SmartRouter.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "getVault",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "immutableReferences": {},
+  "inputSourceName": "project/contracts/SmartRouter.sol",
+  "buildInfoId": "solc-0_8_28-51c3d818a693d245be7a47a5be679da3f979abfe"
+}
