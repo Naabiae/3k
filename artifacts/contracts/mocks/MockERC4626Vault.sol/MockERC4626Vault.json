@@ -836,7 +836,7 @@
   "linkReferences": {},
   "deployedLinkReferences": {},
   "immutableReferences": {
-    "1016": [
+    "1683": [
       {
         "length": 32,
         "start": 582
@@ -858,7 +858,7 @@
         "start": 3100
       }
     ],
-    "1018": [
+    "1685": [
       {
         "length": 32,
         "start": 1323
@@ -866,5 +866,5 @@
     ]
   },
   "inputSourceName": "project/contracts/mocks/MockERC4626Vault.sol",
-  "buildInfoId": "solc-0_8_28-098ead00b442889ea90241f0a08911b529290011"
+  "buildInfoId": "solc-0_8_28-f69b2e800b55637baaab6bcfdc05baf30849bb9f"
 }

@@ -10,31 +10,43 @@ import * as Contracts from "./index.js";
 
 declare module "@nomicfoundation/hardhat-ethers/types" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
-  getContractFactory(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.ISmartRouter__factory>
+  getContractFactory(name: 'ICToken', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.ICToken__factory>
+getContractFactory(name: 'QIELendERC4626Adapter', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.QIELendERC4626Adapter__factory>
+getContractFactory(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.ISmartRouter__factory>
 getContractFactory(name: 'RouterFactory', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.RouterFactory__factory>
 getContractFactory(name: 'IRouterFactory', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.IRouterFactory__factory>
 getContractFactory(name: 'SmartRouter', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.SmartRouter__factory>
+getContractFactory(name: 'MockCToken', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockCToken__factory>
 getContractFactory(name: 'MockERC20', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockERC20__factory>
 getContractFactory(name: 'MockERC4626Vault', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockERC4626Vault__factory>
 
-  getContractAt(name: 'ISmartRouter', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.ISmartRouter>
+  getContractAt(name: 'ICToken', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.ICToken>
+getContractAt(name: 'QIELendERC4626Adapter', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.QIELendERC4626Adapter>
+getContractAt(name: 'ISmartRouter', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.ISmartRouter>
 getContractAt(name: 'RouterFactory', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.RouterFactory>
 getContractAt(name: 'IRouterFactory', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.IRouterFactory>
 getContractAt(name: 'SmartRouter', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.SmartRouter>
+getContractAt(name: 'MockCToken', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockCToken>
 getContractAt(name: 'MockERC20', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockERC20>
 getContractAt(name: 'MockERC4626Vault', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockERC4626Vault>
 
-  deployContract(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ISmartRouter>
+  deployContract(name: 'ICToken', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ICToken>
+deployContract(name: 'QIELendERC4626Adapter', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.QIELendERC4626Adapter>
+deployContract(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ISmartRouter>
 deployContract(name: 'RouterFactory', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.RouterFactory>
 deployContract(name: 'IRouterFactory', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IRouterFactory>
 deployContract(name: 'SmartRouter', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.SmartRouter>
+deployContract(name: 'MockCToken', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockCToken>
 deployContract(name: 'MockERC20', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
 deployContract(name: 'MockERC4626Vault', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC4626Vault>
 
-  deployContract(name: 'ISmartRouter', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ISmartRouter>
+  deployContract(name: 'ICToken', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ICToken>
+deployContract(name: 'QIELendERC4626Adapter', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.QIELendERC4626Adapter>
+deployContract(name: 'ISmartRouter', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ISmartRouter>
 deployContract(name: 'RouterFactory', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.RouterFactory>
 deployContract(name: 'IRouterFactory', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IRouterFactory>
 deployContract(name: 'SmartRouter', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.SmartRouter>
+deployContract(name: 'MockCToken', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockCToken>
 deployContract(name: 'MockERC20', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
 deployContract(name: 'MockERC4626Vault', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC4626Vault>
 

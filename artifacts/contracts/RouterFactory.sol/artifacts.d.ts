@@ -15,7 +15,7 @@ export interface ISmartRouter$Type {
   readonly deployedLinkReferences: {};
   readonly immutableReferences: {};
   readonly inputSourceName: "project/contracts/RouterFactory.sol";
-  readonly buildInfoId: "solc-0_8_28-4c53f3ac6b90ddba78830664251aa4e3eed12d70";
+  readonly buildInfoId: "solc-0_8_28-f69b2e800b55637baaab6bcfdc05baf30849bb9f";
 };
 
 export interface RouterFactory$Type {
@@ -29,7 +29,7 @@ export interface RouterFactory$Type {
   readonly deployedLinkReferences: {};
   readonly immutableReferences: {};
   readonly inputSourceName: "project/contracts/RouterFactory.sol";
-  readonly buildInfoId: "solc-0_8_28-4c53f3ac6b90ddba78830664251aa4e3eed12d70";
+  readonly buildInfoId: "solc-0_8_28-f69b2e800b55637baaab6bcfdc05baf30849bb9f";
 };
 
 import "hardhat/types/artifacts";
