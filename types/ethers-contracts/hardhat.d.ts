@@ -16,6 +16,7 @@ getContractFactory(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | Facto
 getContractFactory(name: 'RouterFactory', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.RouterFactory__factory>
 getContractFactory(name: 'IRouterFactory', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.IRouterFactory__factory>
 getContractFactory(name: 'SmartRouter', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.SmartRouter__factory>
+getContractFactory(name: 'Dummy', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.Dummy__factory>
 getContractFactory(name: 'MockCToken', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockCToken__factory>
 getContractFactory(name: 'MockERC20', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockERC20__factory>
 getContractFactory(name: 'MockERC4626Vault', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockERC4626Vault__factory>
@@ -26,6 +27,7 @@ getContractAt(name: 'ISmartRouter', address: string | ethers.Addressable, signer
 getContractAt(name: 'RouterFactory', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.RouterFactory>
 getContractAt(name: 'IRouterFactory', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.IRouterFactory>
 getContractAt(name: 'SmartRouter', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.SmartRouter>
+getContractAt(name: 'Dummy', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.Dummy>
 getContractAt(name: 'MockCToken', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockCToken>
 getContractAt(name: 'MockERC20', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockERC20>
 getContractAt(name: 'MockERC4626Vault', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockERC4626Vault>
@@ -36,6 +38,7 @@ deployContract(name: 'ISmartRouter', signerOrOptions?: ethers.Signer | DeployCon
 deployContract(name: 'RouterFactory', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.RouterFactory>
 deployContract(name: 'IRouterFactory', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IRouterFactory>
 deployContract(name: 'SmartRouter', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.SmartRouter>
+deployContract(name: 'Dummy', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Dummy>
 deployContract(name: 'MockCToken', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockCToken>
 deployContract(name: 'MockERC20', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
 deployContract(name: 'MockERC4626Vault', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC4626Vault>
@@ -46,6 +49,7 @@ deployContract(name: 'ISmartRouter', args: any[], signerOrOptions?: ethers.Signe
 deployContract(name: 'RouterFactory', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.RouterFactory>
 deployContract(name: 'IRouterFactory', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IRouterFactory>
 deployContract(name: 'SmartRouter', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.SmartRouter>
+deployContract(name: 'Dummy', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Dummy>
 deployContract(name: 'MockCToken', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockCToken>
 deployContract(name: 'MockERC20', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
 deployContract(name: 'MockERC4626Vault', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC4626Vault>

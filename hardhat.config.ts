@@ -12,6 +12,12 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
+    hardhat: {
+      type: "edr-simulated",
+      forking: {
+        url: "https://rpc1mainnet.qie.digital/"
+      }
+    },
     qie: {
       type: "http",
       url: "https://rpc1mainnet.qie.digital/",

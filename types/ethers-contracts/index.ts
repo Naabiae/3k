@@ -22,6 +22,8 @@ export type { IRouterFactory } from './SmartRouter.sol/IRouterFactory.js';
 export { IRouterFactory__factory } from './factories/SmartRouter.sol/IRouterFactory__factory.js';
 export type { SmartRouter } from './SmartRouter.sol/SmartRouter.js';
 export { SmartRouter__factory } from './factories/SmartRouter.sol/SmartRouter__factory.js';
+export type { Dummy } from './mocks/Dummy.js';
+export { Dummy__factory } from './factories/mocks/Dummy__factory.js';
 export type { MockCToken } from './mocks/MockCToken.js';
 export { MockCToken__factory } from './factories/mocks/MockCToken__factory.js';
 export type { MockERC20 } from './mocks/MockERC20.js';
