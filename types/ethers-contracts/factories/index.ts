@@ -5,3 +5,4 @@ export * as qieLendErc4626AdapterSol from './QIELendERC4626Adapter.sol/index.js'
 export * as routerFactorySol from './RouterFactory.sol/index.js';
 export * as smartRouterSol from './SmartRouter.sol/index.js';
 export * as mocks from './mocks/index.js';
+export { SocialJackpot__factory } from './SocialJackpot__factory.js';
