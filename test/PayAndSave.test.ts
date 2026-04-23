@@ -103,8 +103,8 @@ describe("Pay and Save Feature", function () {
 
     savings = await smartRouter.getSavingsValue(await mockERC20.getAddress());
     expect(savings.principal).to.equal(ethers.parseUnits("5", 18));
-    expect(savings.totalValue).to.equal(ethers.parseUnits("10", 18)); // 5 principal + 5 yield
-    expect(savings.yieldEarned).to.equal(ethers.parseUnits("5", 18));
+    expect(savings.totalValue).to.be.closeTo(ethers.parseUnits("10", 18), 2n); // Close to 10 (allow tiny rounding error from shares)
+    expect(savings.yieldEarned).to.be.closeTo(ethers.parseUnits("5", 18), 2n);
   });
 
   it("should allow partial withdrawal of savings and reduce principal correctly", async function () {
