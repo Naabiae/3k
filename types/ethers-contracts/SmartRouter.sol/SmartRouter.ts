@@ -6,40 +6,54 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
   
 
   export interface SmartRouterInterface extends Interface {
-    getFunction(nameOrSignature: "allowanceAmount" | "allowancePeriod" | "claimAllowance" | "factory" | "initialize" | "lastAllowanceRelease" | "lockedPct" | "lockedShares" | "operatingPct" | "owner" | "processPayment" | "treasuryPct" | "treasuryShares" | "updateSettings" | "withdrawTreasury"): FunctionFragment;
+    getFunction(nameOrSignature: "allowanceAmount" | "allowancePeriod" | "claimAllowance" | "factory" | "getSavingsValue" | "initialize" | "lastAllowanceRelease" | "lockedPct" | "lockedShares" | "operatingPct" | "owner" | "payAndSave" | "processPayment" | "savePct" | "savedPrincipal" | "savedShares" | "treasuryPct" | "treasuryShares" | "updateSavePct" | "updateSettings" | "withdrawSavings" | "withdrawTreasury"): FunctionFragment;
 
-    getEvent(nameOrSignatureOrTopic: "AllowanceClaimed" | "Initialized" | "PaymentProcessed" | "SettingsUpdated" | "TreasuryWithdrawn"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "AllowanceClaimed" | "Initialized" | "PaymentProcessed" | "PaymentSentAndSaved" | "SavePctUpdated" | "SavingsWithdrawn" | "SettingsUpdated" | "TreasuryWithdrawn"): EventFragment;
 
     encodeFunctionData(functionFragment: 'allowanceAmount', values?: undefined): string;
 encodeFunctionData(functionFragment: 'allowancePeriod', values?: undefined): string;
 encodeFunctionData(functionFragment: 'claimAllowance', values: [AddressLike]): string;
 encodeFunctionData(functionFragment: 'factory', values?: undefined): string;
+encodeFunctionData(functionFragment: 'getSavingsValue', values: [AddressLike]): string;
 encodeFunctionData(functionFragment: 'initialize', values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BigNumberish, BigNumberish, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'lastAllowanceRelease', values?: undefined): string;
 encodeFunctionData(functionFragment: 'lockedPct', values?: undefined): string;
 encodeFunctionData(functionFragment: 'lockedShares', values?: undefined): string;
 encodeFunctionData(functionFragment: 'operatingPct', values?: undefined): string;
 encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+encodeFunctionData(functionFragment: 'payAndSave', values: [AddressLike, AddressLike, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'processPayment', values: [AddressLike]): string;
+encodeFunctionData(functionFragment: 'savePct', values?: undefined): string;
+encodeFunctionData(functionFragment: 'savedPrincipal', values?: undefined): string;
+encodeFunctionData(functionFragment: 'savedShares', values?: undefined): string;
 encodeFunctionData(functionFragment: 'treasuryPct', values?: undefined): string;
 encodeFunctionData(functionFragment: 'treasuryShares', values?: undefined): string;
+encodeFunctionData(functionFragment: 'updateSavePct', values: [BigNumberish]): string;
 encodeFunctionData(functionFragment: 'updateSettings', values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish, BigNumberish]): string;
+encodeFunctionData(functionFragment: 'withdrawSavings', values: [AddressLike, BigNumberish]): string;
 encodeFunctionData(functionFragment: 'withdrawTreasury', values: [AddressLike, BigNumberish]): string;
 
     decodeFunctionResult(functionFragment: 'allowanceAmount', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'allowancePeriod', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'claimAllowance', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'factory', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'getSavingsValue', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'lastAllowanceRelease', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'lockedPct', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'lockedShares', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'operatingPct', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'payAndSave', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'processPayment', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'savePct', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'savedPrincipal', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'savedShares', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'treasuryPct', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'treasuryShares', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'updateSavePct', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'updateSettings', data: BytesLike): Result;
+decodeFunctionResult(functionFragment: 'withdrawSavings', data: BytesLike): Result;
 decodeFunctionResult(functionFragment: 'withdrawTreasury', data: BytesLike): Result;
   }
 
@@ -72,6 +86,42 @@ decodeFunctionResult(functionFragment: 'withdrawTreasury', data: BytesLike): Res
       export type InputTuple = [token: AddressLike, totalAmount: BigNumberish, operatingAmount: BigNumberish, treasurySharesMinted: BigNumberish, lockedSharesMinted: BigNumberish];
       export type OutputTuple = [token: string, totalAmount: bigint, operatingAmount: bigint, treasurySharesMinted: bigint, lockedSharesMinted: bigint];
       export interface OutputObject {token: string, totalAmount: bigint, operatingAmount: bigint, treasurySharesMinted: bigint, lockedSharesMinted: bigint };
+      export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>
+      export type Filter = TypedDeferredTopicFilter<Event>
+      export type Log = TypedEventLog<Event>
+      export type LogDescription = TypedLogDescription<Event>
+    }
+
+  
+
+    export namespace PaymentSentAndSavedEvent {
+      export type InputTuple = [token: AddressLike, recipient: AddressLike, amountSent: BigNumberish, amountSaved: BigNumberish, sharesMinted: BigNumberish];
+      export type OutputTuple = [token: string, recipient: string, amountSent: bigint, amountSaved: bigint, sharesMinted: bigint];
+      export interface OutputObject {token: string, recipient: string, amountSent: bigint, amountSaved: bigint, sharesMinted: bigint };
+      export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>
+      export type Filter = TypedDeferredTopicFilter<Event>
+      export type Log = TypedEventLog<Event>
+      export type LogDescription = TypedLogDescription<Event>
+    }
+
+  
+
+    export namespace SavePctUpdatedEvent {
+      export type InputTuple = [newSavePct: BigNumberish];
+      export type OutputTuple = [newSavePct: bigint];
+      export interface OutputObject {newSavePct: bigint };
+      export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>
+      export type Filter = TypedDeferredTopicFilter<Event>
+      export type Log = TypedEventLog<Event>
+      export type LogDescription = TypedLogDescription<Event>
+    }
+
+  
+
+    export namespace SavingsWithdrawnEvent {
+      export type InputTuple = [token: AddressLike, amountWithdrawn: BigNumberish, sharesBurned: BigNumberish];
+      export type OutputTuple = [token: string, amountWithdrawn: bigint, sharesBurned: bigint];
+      export interface OutputObject {token: string, amountWithdrawn: bigint, sharesBurned: bigint };
       export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>
       export type Filter = TypedDeferredTopicFilter<Event>
       export type Log = TypedEventLog<Event>
@@ -170,6 +220,14 @@ decodeFunctionResult(functionFragment: 'withdrawTreasury', data: BytesLike): Res
     
 
     
+    getSavingsValue: TypedContractMethod<
+      [token: AddressLike, ],
+      [[bigint, bigint, bigint] & {principal: bigint, totalValue: bigint, yieldEarned: bigint }],
+      'view'
+    >
+    
+
+    
     initialize: TypedContractMethod<
       [_owner: AddressLike, _factory: AddressLike, _operatingPct: BigNumberish, _treasuryPct: BigNumberish, _lockedPct: BigNumberish, _allowanceAmount: BigNumberish, _allowancePeriod: BigNumberish, ],
       [void],
@@ -218,10 +276,42 @@ decodeFunctionResult(functionFragment: 'withdrawTreasury', data: BytesLike): Res
     
 
     
+    payAndSave: TypedContractMethod<
+      [token: AddressLike, recipient: AddressLike, amount: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
     processPayment: TypedContractMethod<
       [token: AddressLike, ],
       [void],
       'nonpayable'
+    >
+    
+
+    
+    savePct: TypedContractMethod<
+      [],
+      [bigint],
+      'view'
+    >
+    
+
+    
+    savedPrincipal: TypedContractMethod<
+      [],
+      [bigint],
+      'view'
+    >
+    
+
+    
+    savedShares: TypedContractMethod<
+      [],
+      [bigint],
+      'view'
     >
     
 
@@ -242,8 +332,24 @@ decodeFunctionResult(functionFragment: 'withdrawTreasury', data: BytesLike): Res
     
 
     
+    updateSavePct: TypedContractMethod<
+      [_savePct: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
     updateSettings: TypedContractMethod<
       [_operatingPct: BigNumberish, _treasuryPct: BigNumberish, _lockedPct: BigNumberish, _allowanceAmount: BigNumberish, _allowancePeriod: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >
+    
+
+    
+    withdrawSavings: TypedContractMethod<
+      [token: AddressLike, amount: BigNumberish, ],
       [void],
       'nonpayable'
     >
@@ -280,6 +386,11 @@ getFunction(nameOrSignature: 'factory'): TypedContractMethod<
       [string],
       'view'
     >;
+getFunction(nameOrSignature: 'getSavingsValue'): TypedContractMethod<
+      [token: AddressLike, ],
+      [[bigint, bigint, bigint] & {principal: bigint, totalValue: bigint, yieldEarned: bigint }],
+      'view'
+    >;
 getFunction(nameOrSignature: 'initialize'): TypedContractMethod<
       [_owner: AddressLike, _factory: AddressLike, _operatingPct: BigNumberish, _treasuryPct: BigNumberish, _lockedPct: BigNumberish, _allowanceAmount: BigNumberish, _allowancePeriod: BigNumberish, ],
       [void],
@@ -310,10 +421,30 @@ getFunction(nameOrSignature: 'owner'): TypedContractMethod<
       [string],
       'view'
     >;
+getFunction(nameOrSignature: 'payAndSave'): TypedContractMethod<
+      [token: AddressLike, recipient: AddressLike, amount: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
 getFunction(nameOrSignature: 'processPayment'): TypedContractMethod<
       [token: AddressLike, ],
       [void],
       'nonpayable'
+    >;
+getFunction(nameOrSignature: 'savePct'): TypedContractMethod<
+      [],
+      [bigint],
+      'view'
+    >;
+getFunction(nameOrSignature: 'savedPrincipal'): TypedContractMethod<
+      [],
+      [bigint],
+      'view'
+    >;
+getFunction(nameOrSignature: 'savedShares'): TypedContractMethod<
+      [],
+      [bigint],
+      'view'
     >;
 getFunction(nameOrSignature: 'treasuryPct'): TypedContractMethod<
       [],
@@ -325,8 +456,18 @@ getFunction(nameOrSignature: 'treasuryShares'): TypedContractMethod<
       [bigint],
       'view'
     >;
+getFunction(nameOrSignature: 'updateSavePct'): TypedContractMethod<
+      [_savePct: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
 getFunction(nameOrSignature: 'updateSettings'): TypedContractMethod<
       [_operatingPct: BigNumberish, _treasuryPct: BigNumberish, _lockedPct: BigNumberish, _allowanceAmount: BigNumberish, _allowancePeriod: BigNumberish, ],
+      [void],
+      'nonpayable'
+    >;
+getFunction(nameOrSignature: 'withdrawSavings'): TypedContractMethod<
+      [token: AddressLike, amount: BigNumberish, ],
       [void],
       'nonpayable'
     >;
@@ -339,6 +480,9 @@ getFunction(nameOrSignature: 'withdrawTreasury'): TypedContractMethod<
     getEvent(key: 'AllowanceClaimed'): TypedContractEvent<AllowanceClaimedEvent.InputTuple, AllowanceClaimedEvent.OutputTuple, AllowanceClaimedEvent.OutputObject>;
 getEvent(key: 'Initialized'): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
 getEvent(key: 'PaymentProcessed'): TypedContractEvent<PaymentProcessedEvent.InputTuple, PaymentProcessedEvent.OutputTuple, PaymentProcessedEvent.OutputObject>;
+getEvent(key: 'PaymentSentAndSaved'): TypedContractEvent<PaymentSentAndSavedEvent.InputTuple, PaymentSentAndSavedEvent.OutputTuple, PaymentSentAndSavedEvent.OutputObject>;
+getEvent(key: 'SavePctUpdated'): TypedContractEvent<SavePctUpdatedEvent.InputTuple, SavePctUpdatedEvent.OutputTuple, SavePctUpdatedEvent.OutputObject>;
+getEvent(key: 'SavingsWithdrawn'): TypedContractEvent<SavingsWithdrawnEvent.InputTuple, SavingsWithdrawnEvent.OutputTuple, SavingsWithdrawnEvent.OutputObject>;
 getEvent(key: 'SettingsUpdated'): TypedContractEvent<SettingsUpdatedEvent.InputTuple, SettingsUpdatedEvent.OutputTuple, SettingsUpdatedEvent.OutputObject>;
 getEvent(key: 'TreasuryWithdrawn'): TypedContractEvent<TreasuryWithdrawnEvent.InputTuple, TreasuryWithdrawnEvent.OutputTuple, TreasuryWithdrawnEvent.OutputObject>;
 
@@ -354,6 +498,18 @@ getEvent(key: 'TreasuryWithdrawn'): TypedContractEvent<TreasuryWithdrawnEvent.In
 
       'PaymentProcessed(address,uint256,uint256,uint256,uint256)': TypedContractEvent<PaymentProcessedEvent.InputTuple, PaymentProcessedEvent.OutputTuple, PaymentProcessedEvent.OutputObject>;
       PaymentProcessed: TypedContractEvent<PaymentProcessedEvent.InputTuple, PaymentProcessedEvent.OutputTuple, PaymentProcessedEvent.OutputObject>;
+    
+
+      'PaymentSentAndSaved(address,address,uint256,uint256,uint256)': TypedContractEvent<PaymentSentAndSavedEvent.InputTuple, PaymentSentAndSavedEvent.OutputTuple, PaymentSentAndSavedEvent.OutputObject>;
+      PaymentSentAndSaved: TypedContractEvent<PaymentSentAndSavedEvent.InputTuple, PaymentSentAndSavedEvent.OutputTuple, PaymentSentAndSavedEvent.OutputObject>;
+    
+
+      'SavePctUpdated(uint256)': TypedContractEvent<SavePctUpdatedEvent.InputTuple, SavePctUpdatedEvent.OutputTuple, SavePctUpdatedEvent.OutputObject>;
+      SavePctUpdated: TypedContractEvent<SavePctUpdatedEvent.InputTuple, SavePctUpdatedEvent.OutputTuple, SavePctUpdatedEvent.OutputObject>;
+    
+
+      'SavingsWithdrawn(address,uint256,uint256)': TypedContractEvent<SavingsWithdrawnEvent.InputTuple, SavingsWithdrawnEvent.OutputTuple, SavingsWithdrawnEvent.OutputObject>;
+      SavingsWithdrawn: TypedContractEvent<SavingsWithdrawnEvent.InputTuple, SavingsWithdrawnEvent.OutputTuple, SavingsWithdrawnEvent.OutputObject>;
     
 
       'SettingsUpdated(uint256,uint256,uint256,uint256,uint256)': TypedContractEvent<SettingsUpdatedEvent.InputTuple, SettingsUpdatedEvent.OutputTuple, SettingsUpdatedEvent.OutputObject>;

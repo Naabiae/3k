@@ -28,10 +28,18 @@ contract SmartRouter is Initializable {
     uint256 public treasuryShares;
     uint256 public lockedShares;
 
+    // Pay & Save tracking
+    uint256 public savePct;
+    uint256 public savedPrincipal;
+    uint256 public savedShares;
+
     event PaymentProcessed(address indexed token, uint256 totalAmount, uint256 operatingAmount, uint256 treasurySharesMinted, uint256 lockedSharesMinted);
     event AllowanceClaimed(address indexed token, uint256 amountClaimed, uint256 sharesBurned);
     event TreasuryWithdrawn(address indexed token, uint256 amountWithdrawn, uint256 sharesBurned);
     event SettingsUpdated(uint256 operatingPct, uint256 treasuryPct, uint256 lockedPct, uint256 allowanceAmount, uint256 allowancePeriod);
+    event SavePctUpdated(uint256 newSavePct);
+    event PaymentSentAndSaved(address indexed token, address indexed recipient, uint256 amountSent, uint256 amountSaved, uint256 sharesMinted);
+    event SavingsWithdrawn(address indexed token, uint256 amountWithdrawn, uint256 sharesBurned);
 
     error Unauthorized();
     error InvalidPercentages();
@@ -39,6 +47,8 @@ contract SmartRouter is Initializable {
     error AllowancePeriodNotMet();
     error InsufficientLockedShares();
     error InsufficientTreasuryShares();
+    error InsufficientSavedShares();
+    error ExceedsMaxPercentage();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert Unauthorized();
@@ -200,5 +210,98 @@ contract SmartRouter is Initializable {
         allowancePeriod = _allowancePeriod;
 
         emit SettingsUpdated(_operatingPct, _treasuryPct, _lockedPct, _allowanceAmount, _allowancePeriod);
+    }
+
+    /**
+     * @dev Updates the global savings percentage for outgoing payments.
+     */
+    function updateSavePct(uint256 _savePct) external onlyOwner {
+        if (_savePct > 10000) revert ExceedsMaxPercentage();
+        savePct = _savePct;
+        emit SavePctUpdated(_savePct);
+    }
+
+    /**
+     * @dev Pay a recipient and automatically deduct the savings percentage from the owner's wallet.
+     * Requires the owner to have approved this contract to spend their tokens.
+     */
+    function payAndSave(address token, address recipient, uint256 amount) external onlyOwner {
+        uint256 saveAmount = (amount * savePct) / 10000;
+        uint256 totalRequired = amount + saveAmount;
+
+        // Pull funds from owner
+        IERC20(token).safeTransferFrom(owner, address(this), totalRequired);
+
+        // Send payment to recipient
+        IERC20(token).safeTransfer(recipient, amount);
+
+        // Deposit savings into Vault
+        uint256 sharesMinted = 0;
+        if (saveAmount > 0) {
+            address vaultAddress = IRouterFactory(factory).getVault(token);
+            if (vaultAddress == address(0)) revert VaultNotSupported();
+
+            IERC4626 vault = IERC4626(vaultAddress);
+            IERC20(token).safeIncreaseAllowance(vaultAddress, saveAmount);
+            
+            sharesMinted = vault.deposit(saveAmount, address(this));
+
+            savedPrincipal += saveAmount;
+            savedShares += sharesMinted;
+        }
+
+        emit PaymentSentAndSaved(token, recipient, amount, saveAmount, sharesMinted);
+    }
+
+    /**
+     * @dev Withdraws from the saved shares.
+     */
+    function withdrawSavings(address token, uint256 amount) external onlyOwner {
+        if (amount == 0) return;
+
+        address vaultAddress = IRouterFactory(factory).getVault(token);
+        if (vaultAddress == address(0)) revert VaultNotSupported();
+
+        IERC4626 vault = IERC4626(vaultAddress);
+        
+        uint256 sharesNeeded;
+        if (amount == type(uint256).max) {
+            sharesNeeded = savedShares;
+            amount = vault.previewRedeem(sharesNeeded);
+        } else {
+            sharesNeeded = vault.previewWithdraw(amount);
+            if (sharesNeeded > savedShares) revert InsufficientSavedShares();
+        }
+
+        if (sharesNeeded == 0) return;
+
+        // Reduce principal proportionally
+        // (sharesNeeded / savedShares) * savedPrincipal
+        uint256 principalReduction = (sharesNeeded * savedPrincipal) / savedShares;
+        savedPrincipal -= principalReduction;
+        savedShares -= sharesNeeded;
+
+        uint256 amountWithdrawn = vault.redeem(sharesNeeded, owner, address(this));
+
+        emit SavingsWithdrawn(token, amountWithdrawn, sharesNeeded);
+    }
+
+    /**
+     * @dev Helper to read the current value of the saved bucket.
+     */
+    function getSavingsValue(address token) external view returns (uint256 principal, uint256 totalValue, uint256 yieldEarned) {
+        principal = savedPrincipal;
+        if (savedShares > 0) {
+            address vaultAddress = IRouterFactory(factory).getVault(token);
+            if (vaultAddress != address(0)) {
+                totalValue = IERC4626(vaultAddress).previewRedeem(savedShares);
+            }
+        }
+        
+        if (totalValue > principal) {
+            yieldEarned = totalValue - principal;
+        } else {
+            yieldEarned = 0;
+        }
     }
 }
