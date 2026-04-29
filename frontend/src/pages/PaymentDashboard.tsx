@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useWallet } from '../context/WalletContext'
 import Navbar from '../components/Navbar'
 import BalanceCard from '../components/BalanceCard'
@@ -10,23 +9,15 @@ import {
   Wallet,
   Send,
   History,
-  Bell,
   Settings as SettingsIcon,
-  LogOut,
   QrCode,
-  CheckCircle,
-  Users,
   Copy,
-  TrendingUp,
-  Lock,
-  Zap,
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react'
 
 export default function PaymentDashboard() {
-  const navigate = useNavigate()
-  const { address, connect, isCorrectNetwork, switchNetwork, disconnect } = useWallet()
+  const { address, connect, isCorrectNetwork, switchNetwork } = useWallet()
   
   // Active page state
   const [activePage, setActivePage] = useState<'dashboard' | 'send' | 'receipts' | 'settings'>('dashboard')

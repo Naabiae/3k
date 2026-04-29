@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Send, Mail, CreditCard, FileText, Copy, CheckCircle, QrCode as QrCodeIcon, XCircle, ArrowLeft, QrCode } from 'lucide-react'
+import { X, Send, Mail, FileText, Copy, CheckCircle, XCircle, ArrowLeft, QrCode } from 'lucide-react'
 
 
 interface SendPaymentModalProps {
