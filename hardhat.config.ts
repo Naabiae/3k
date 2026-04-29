@@ -2,14 +2,23 @@ import { HardhatUserConfig } from "hardhat/config";
 import toolbox from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
 
 const config: HardhatUserConfig = {
+  paths: {
+    cache: "./cache",
+    artifacts: "./artifacts"
+  },
+  compilersCache: "./cache/compilers",
   solidity: {
-    version: "0.8.28",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
+    compilers: [
+      {
+        version: "0.8.28",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       }
-    }
+    ]
   },
   networks: {
     hardhat: {
