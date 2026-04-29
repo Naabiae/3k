@@ -17,6 +17,7 @@ interface ISmartRouter {
 
 contract RouterFactory {
     address public owner;
+    address public pendingOwner;
     address public routerImplementation;
 
     // Mapping from Token Address => ERC4626 Vault Address
@@ -27,9 +28,13 @@ contract RouterFactory {
 
     event VaultWhitelisted(address indexed token, address indexed vault);
     event RouterDeployed(address indexed owner, address indexed router);
+    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event ImplementationUpdated(address indexed oldImpl, address indexed newImpl);
 
     error Unauthorized();
     error ZeroAddress();
+    error NoPendingOwner();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert Unauthorized();
@@ -90,5 +95,35 @@ contract RouterFactory {
      */
     function getUserRouters(address user) external view returns (address[] memory) {
         return userRouters[user];
+    }
+
+    /**
+     * @dev Start ownership transfer to a new address. The new owner must accept.
+     */
+    function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert ZeroAddress();
+        pendingOwner = newOwner;
+        emit OwnershipTransferStarted(owner, newOwner);
+    }
+
+    /**
+     * @dev Accept ownership transfer. Must be called by the pending owner.
+     */
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert NoPendingOwner();
+        address oldOwner = owner;
+        owner = pendingOwner;
+        pendingOwner = address(0);
+        emit OwnershipTransferred(oldOwner, owner);
+    }
+
+    /**
+     * @dev Update the router implementation address.
+     */
+    function updateImplementation(address newImplementation) external onlyOwner {
+        if (newImplementation == address(0)) revert ZeroAddress();
+        address oldImpl = routerImplementation;
+        routerImplementation = newImplementation;
+        emit ImplementationUpdated(oldImpl, newImplementation);
     }
 }

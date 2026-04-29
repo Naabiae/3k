@@ -7,6 +7,7 @@ describe("SocialJackpot Feature", function () {
   let jackpot: any;
   
   let owner: any;
+  let feeRecipient: any;
   let p1: any, p2: any, p3: any, p4: any;
   let signers: any[];
 
@@ -18,6 +19,7 @@ describe("SocialJackpot Feature", function () {
   beforeEach(async function () {
     signers = await ethers.getSigners();
     owner = signers[0];
+    feeRecipient = signers[5];
     p1 = signers[1];
     p2 = signers[2];
     p3 = signers[3];
@@ -28,7 +30,7 @@ describe("SocialJackpot Feature", function () {
     await mockERC20.waitForDeployment();
 
     const SocialJackpot = await ethers.getContractFactory("SocialJackpot");
-    jackpot = await SocialJackpot.deploy();
+    jackpot = await SocialJackpot.deploy(feeRecipient.address);
     await jackpot.waitForDeployment();
 
     // Mint funds and approve
@@ -39,6 +41,9 @@ describe("SocialJackpot Feature", function () {
   });
 
   it("should create a room correctly", async function () {
+    expect(await jackpot.feeRecipient()).to.equal(feeRecipient.address);
+    expect(await jackpot.PLATFORM_FEE_BPS()).to.equal(200n);
+
     const tx = await jackpot.connect(p1).createRoom(
         await mockERC20.getAddress(),
         ethers.parseUnits("10", 18),
@@ -92,9 +97,11 @@ describe("SocialJackpot Feature", function () {
     // P3 votes for P1
     await jackpot.connect(p3).vote(0, p1.address);
     // P4 votes for P2
-    // This should trigger resolveRoom. 
+    const feeRecipientBalBefore = await mockERC20.balanceOf(feeRecipient.address);
+
+    // This should trigger resolveRoom.
     // Votes: P1(2), P2(2), P3(0), P4(0). Total pot: 40. Top 2 winners are P1 and P2.
-    // They should get 20 each.
+    // Platform gets 2% (0.8), winners split the remaining 39.2 and get 19.6 each.
     await jackpot.connect(p4).vote(0, p2.address);
 
     const room = await jackpot.rooms(0);
@@ -103,10 +110,12 @@ describe("SocialJackpot Feature", function () {
     const p1BalAfter = await mockERC20.balanceOf(p1.address);
     const p2BalAfter = await mockERC20.balanceOf(p2.address);
     const p3BalAfter = await mockERC20.balanceOf(p3.address);
+    const feeRecipientBalAfter = await mockERC20.balanceOf(feeRecipient.address);
 
-    // P1 and P2 should have received 20 each
-    expect(p1BalAfter - p1BalBefore).to.equal(ethers.parseUnits("20", 18));
-    expect(p2BalAfter - p2BalBefore).to.equal(ethers.parseUnits("20", 18));
+    // P1 and P2 should have received 19.6 each after the 2% platform fee
+    expect(p1BalAfter - p1BalBefore).to.equal(ethers.parseUnits("19.6", 18));
+    expect(p2BalAfter - p2BalBefore).to.equal(ethers.parseUnits("19.6", 18));
+    expect(feeRecipientBalAfter - feeRecipientBalBefore).to.equal(ethers.parseUnits("0.8", 18));
     
     // P3 gets nothing
     expect(p3BalAfter).to.equal(p3BalBefore);

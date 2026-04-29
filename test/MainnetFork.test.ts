@@ -107,6 +107,7 @@ describe("QIE Mainnet Fork Tests", function () {
       
       // We will just assume we can find the balance slot. QUSDC slot is usually 0, 1 or 2.
       const senderAddress = sender.address;
+      console.log("Sender:", senderAddress);
       
       // Function to find balance slot
       async function findBalanceSlot(tokenAddress: string, accountAddress: string) {
@@ -123,6 +124,7 @@ describe("QIE Mainnet Fork Tests", function () {
       }
 
       const slot = await findBalanceSlot(QUSDC_ADDRESS, "0x0000000000000000000000000000000000000000"); // Just guess slot 1
+      console.log("Found balance slot:", slot);
       
       // Let's manually set the balance of sender to 10,000 QUSDC
       const account = senderAddress.toLowerCase().replace("0x", "");
@@ -135,8 +137,9 @@ describe("QIE Mainnet Fork Tests", function () {
           hash,
           amountHex
       ]);
-
+      console.log("Set balance for sender. Hash:", hash, "Amount (hex):", amountHex);
       const balance = await qusdc.balanceOf(sender.address);
+      console.log("Balance:", ethers.formatUnits(balance, 6));
       if (balance == 0n) {
           // If slot 1 failed, let's try slot 0
           const storageSlot0 = ethers.toBeHex(0).replace("0x", "").padStart(64, "0");
@@ -144,7 +147,8 @@ describe("QIE Mainnet Fork Tests", function () {
           await ethers.provider.send("hardhat_setStorageAt", [QUSDC_ADDRESS, hash0, amountHex]);
       }
       
-      const finalBalance = await qusdc.balanceOf(sender.address);
+      const finalBalance = await qusdc.balanceOf(senderAddress);
+      console.log("Final balance:", ethers.formatUnits(finalBalance, 6));
       expect(finalBalance).to.be.gt(0n);
 
       const paymentAmount = ethers.parseUnits("1000", 6);

@@ -7,6 +7,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 contract SocialJackpot {
     using SafeERC20 for IERC20;
 
+    uint256 public constant PLATFORM_FEE_BPS = 200;
+    uint256 private constant BPS_DENOMINATOR = 10_000;
+
     enum RoomState { Open, Voting, Closed }
 
     struct Participant {
@@ -29,6 +32,7 @@ contract SocialJackpot {
     }
 
     uint256 public nextRoomId;
+    address public immutable feeRecipient;
 
     mapping(uint256 => RoomInfo) public rooms;
     mapping(uint256 => address[]) public roomParticipants;
@@ -40,8 +44,10 @@ contract SocialJackpot {
     event VotingStarted(uint256 indexed roomId);
     event Voted(uint256 indexed roomId, address indexed voter, address indexed candidate);
     event RoomResolved(uint256 indexed roomId, address[] winners, uint256 payoutPerWinner);
+    event PlatformFeePaid(uint256 indexed roomId, address indexed recipient, uint256 amount);
 
     error InvalidRoomParams();
+    error InvalidFeeRecipient();
     error InvalidState();
     error AlreadyEntered();
     error RoomFull();
@@ -50,6 +56,11 @@ contract SocialJackpot {
     error CannotVoteForSelf();
     error InvalidCandidate();
     error TransferFailed();
+
+    constructor(address _feeRecipient) {
+        if (_feeRecipient == address(0)) revert InvalidFeeRecipient();
+        feeRecipient = _feeRecipient;
+    }
 
     /**
      * @dev Create a new Jackpot Room.
@@ -146,6 +157,23 @@ contract SocialJackpot {
         RoomInfo storage room = rooms[roomId];
         room.state = RoomState.Closed;
 
+        address[] memory sorted = _sortedParticipantsByVotes(roomId);
+        uint256 actualWinnerCount = _countWinners(roomId, sorted, room.numWinners);
+
+        address[] memory finalWinners = new address[](actualWinnerCount);
+        uint256 pot = room.entryFee * room.maxParticipants;
+        uint256 platformFee = (pot * PLATFORM_FEE_BPS) / BPS_DENOMINATOR;
+        uint256 prizePot = pot - platformFee;
+        uint256 payoutPerWinner = prizePot / actualWinnerCount;
+        uint256 dust = prizePot - (payoutPerWinner * actualWinnerCount);
+
+        _payPlatformFee(roomId, room.token, platformFee);
+        _payWinners(room.token, sorted, finalWinners, payoutPerWinner, dust);
+
+        emit RoomResolved(roomId, finalWinners, payoutPerWinner);
+    }
+
+    function _sortedParticipantsByVotes(uint256 roomId) internal view returns (address[] memory) {
         address[] memory pList = roomParticipants[roomId];
         uint256 n = pList.length;
 
@@ -166,8 +194,17 @@ contract SocialJackpot {
             }
         }
 
+        return sorted;
+    }
+
+    function _countWinners(
+        uint256 roomId,
+        address[] memory sorted,
+        uint256 numWinners
+    ) internal view returns (uint256) {
+        uint256 n = sorted.length;
         // Determine the vote threshold for the lowest winning spot
-        uint256 thresholdVotes = participants[roomId][sorted[room.numWinners - 1]].votesReceived;
+        uint256 thresholdVotes = participants[roomId][sorted[numWinners - 1]].votesReceived;
 
         // Find all participants who meet or exceed the threshold
         uint256 actualWinnerCount = 0;
@@ -182,16 +219,29 @@ contract SocialJackpot {
             actualWinnerCount = n;
         }
 
-        address[] memory finalWinners = new address[](actualWinnerCount);
-        uint256 pot = room.entryFee * room.maxParticipants;
-        uint256 payoutPerWinner = pot / actualWinnerCount;
+        return actualWinnerCount;
+    }
 
-        for (uint256 i = 0; i < actualWinnerCount; i++) {
-            finalWinners[i] = sorted[i];
-            room.token.safeTransfer(finalWinners[i], payoutPerWinner);
+    function _payPlatformFee(uint256 roomId, IERC20 token, uint256 platformFee) internal {
+        if (platformFee > 0) {
+            token.safeTransfer(feeRecipient, platformFee);
+            emit PlatformFeePaid(roomId, feeRecipient, platformFee);
         }
+    }
 
-        emit RoomResolved(roomId, finalWinners, payoutPerWinner);
+    function _payWinners(
+        IERC20 token,
+        address[] memory sorted,
+        address[] memory finalWinners,
+        uint256 payoutPerWinner,
+        uint256 dust
+    ) internal {
+        for (uint256 i = 0; i < finalWinners.length; i++) {
+            finalWinners[i] = sorted[i];
+            // Give dust to the first winner (highest votes)
+            uint256 payout = (i == 0) ? payoutPerWinner + dust : payoutPerWinner;
+            token.safeTransfer(finalWinners[i], payout);
+        }
     }
 
     /**

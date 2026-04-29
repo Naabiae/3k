@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
 const kycRoutes = require('./routes/kycRoutes');
@@ -11,18 +12,71 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API Routes
-app.use('/api/kyc', kycRoutes);
-app.use('/api/payments', paymentRoutes);
+// MongoDB connection URI
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vicezealor_db_user:bQHNL5fFkLKSgAxO@cluster0.ucm88sl.mongodb.net/?appName=Cluster0';
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'QIE Smart Router Backend' });
-});
+// Database and collections
+let db = null;
+let usersCollection = null;
+let paymentsCollection = null;
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`- KYC endpoints at http://localhost:${PORT}/api/kyc`);
-    console.log(`- Payment endpoints at http://localhost:${PORT}/api/payments`);
+async function connectDB() {
+  try {
+    const client = new MongoClient(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+    });
+
+    await client.connect();
+    console.log('✅ Connected to MongoDB');
+
+    db = client.db('qie_pay');
+    usersCollection = db.collection('users');
+    paymentsCollection = db.collection('payments');
+
+    // Create indexes
+    await usersCollection.createIndex({ email: 1 }, { unique: true });
+    await usersCollection.createIndex({ walletAddress: 1 }, { unique: true });
+    await paymentsCollection.createIndex({ senderEmail: 1 });
+    await paymentsCollection.createIndex({ recipientEmail: 1 });
+    await paymentsCollection.createIndex({ createdAt: -1 });
+
+    console.log('✅ Database indexes created');
+
+    // Make db available to routes
+    app.locals.db = db;
+    app.locals.usersCollection = usersCollection;
+    app.locals.paymentsCollection = paymentsCollection;
+
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    console.error('Please ensure MongoDB Atlas connection string is correct in .env');
+    process.exit(1);
+  }
+}
+
+// Connect to database before starting server
+connectDB().then(() => {
+  // API Routes
+  app.use('/api/kyc', kycRoutes);
+  app.use('/api/payments', paymentRoutes);
+
+  // Health check endpoint
+  app.get('/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      service: 'QIE Pay Backend',
+      database: db ? 'connected' : 'disconnected',
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📡 Health check: http://localhost:${PORT}/health`);
+    console.log(`🔐 KYC endpoints: http://localhost:${PORT}/api/kyc`);
+    console.log(`💳 Payment endpoints: http://localhost:${PORT}/api/payments`);
+  });
 });

@@ -5,15 +5,17 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/interfaces/IERC4626.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 interface IRouterFactory {
     function getVault(address token) external view returns (address);
 }
 
-contract SmartRouter is Initializable {
+contract SmartRouter is Initializable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     address public owner;
+    address public pendingOwner;
     address public factory;
 
     uint256 public operatingPct;
@@ -49,6 +51,12 @@ contract SmartRouter is Initializable {
     error InsufficientTreasuryShares();
     error InsufficientSavedShares();
     error ExceedsMaxPercentage();
+    error ZeroAddress();
+    error NoPendingOwner();
+
+    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event EmergencyWithdraw(address indexed token, uint256 amount);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert Unauthorized();
@@ -297,11 +305,63 @@ contract SmartRouter is Initializable {
                 totalValue = IERC4626(vaultAddress).previewRedeem(savedShares);
             }
         }
-        
+
         if (totalValue > principal) {
             yieldEarned = totalValue - principal;
         } else {
             yieldEarned = 0;
+        }
+    }
+
+    /**
+     * @dev Get total value of treasury bucket in underlying tokens.
+     */
+    function getTreasuryValue(address token) external view returns (uint256) {
+        if (treasuryShares == 0) return 0;
+        address vaultAddress = IRouterFactory(factory).getVault(token);
+        if (vaultAddress == address(0)) return 0;
+        return IERC4626(vaultAddress).previewRedeem(treasuryShares);
+    }
+
+    /**
+     * @dev Get total value of locked bucket in underlying tokens.
+     */
+    function getLockedValue(address token) external view returns (uint256) {
+        if (lockedShares == 0) return 0;
+        address vaultAddress = IRouterFactory(factory).getVault(token);
+        if (vaultAddress == address(0)) return 0;
+        return IERC4626(vaultAddress).previewRedeem(lockedShares);
+    }
+
+    /**
+     * @dev Start ownership transfer to a new address. The new owner must accept.
+     */
+    function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert ZeroAddress();
+        pendingOwner = newOwner;
+        emit OwnershipTransferStarted(owner, newOwner);
+    }
+
+    /**
+     * @dev Accept ownership transfer. Must be called by the pending owner.
+     */
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert NoPendingOwner();
+        address oldOwner = owner;
+        owner = pendingOwner;
+        pendingOwner = address(0);
+        emit OwnershipTransferred(oldOwner, owner);
+    }
+
+    /**
+     * @dev Emergency withdraw stuck tokens that are not in vaults.
+     * Only for tokens accidentally sent directly to this contract.
+     */
+    function emergencyWithdraw(address token) external onlyOwner nonReentrant {
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        if (balance > 0) {
+            IERC20(token).safeTransfer(owner, balance);
+            emit EmergencyWithdraw(token, balance);
         }
     }
 }
