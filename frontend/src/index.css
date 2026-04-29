@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+}
+
+::selection {
+  background: rgba(255, 75, 0, 0.22);
+}
+
+.grain {
+  background-image: theme('backgroundImage.grain');
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.prose :where(a):not(:where([class~="not-prose"] *)) {
+  @apply text-flare-200 underline decoration-flare-500/40 underline-offset-4 hover:text-white hover:decoration-flare-400;
+}
