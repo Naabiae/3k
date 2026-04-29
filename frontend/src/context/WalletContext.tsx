@@ -10,16 +10,16 @@ interface WalletContextType {
   switchNetwork: () => Promise<void>
 }
 
-const QIE_CHAIN_ID = Number(((import.meta as any).env?.VITE_CHAIN_ID as string | undefined) ?? 1990)
+const QIE_CHAIN_ID = Number(((import.meta as any).env?.VITE_CHAIN_ID as string | undefined) ?? 1983)
 const QIE_NETWORK_CONFIG = {
   chainId: `0x${QIE_CHAIN_ID.toString(16)}`,
-  chainName: (((import.meta as any).env?.VITE_CHAIN_NAME as string | undefined) ?? 'QIE Network') as string,
+  chainName: (((import.meta as any).env?.VITE_CHAIN_NAME as string | undefined) ?? 'QIE Testnet') as string,
   nativeCurrency: {
     name: 'QIE',
     symbol: 'QIE',
     decimals: 18,
   },
-  rpcUrls: [(((import.meta as any).env?.VITE_RPC_URL as string | undefined) ?? 'https://rpc.qiblockchain.online') as string],
+  rpcUrls: [(((import.meta as any).env?.VITE_RPC_URL as string | undefined) ?? 'https://rpc1testnet.qie.digital') as string],
   blockExplorerUrls: [(((import.meta as any).env?.VITE_EXPLORER_URL as string | undefined) ?? 'https://explorer.qiblockchain.online') as string],
 }
 
