@@ -3,6 +3,7 @@ import { useWallet } from '../context/WalletContext'
 import SendPaymentModal from '../components/SendPaymentModal'
 import ReceiptsPage from '../components/ReceiptsPage'
 import SettingsPage from '../components/SettingsPage'
+import SocialJackpot from './SocialJackpot'
 import { formatUnits, parseUnits } from 'ethers'
 import { apiRequest } from '../lib/api'
 import {
@@ -30,10 +31,11 @@ import {
   PiggyBank,
   Search,
   Settings as SettingsIcon,
+  Trophy,
   User,
 } from 'lucide-react'
 
-type NavKey = 'dashboard' | 'payments' | 'deposits' | 'history' | 'account' | 'settings' | 'help' | 'receipts'
+type NavKey = 'dashboard' | 'payments' | 'deposits' | 'history' | 'account' | 'settings' | 'help' | 'receipts' | 'jackpot'
 
 function formatNumber(value: number) {
   return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
@@ -99,9 +101,9 @@ function MiniBarChart({ series }: { series: Array<{ label: string; a: number; b:
   )
 }
 
-export default function PaymentDashboard() {
+export default function PaymentDashboard({ initialActive }: { initialActive?: NavKey }) {
   const { address, chainId, connect, isCorrectNetwork, switchNetwork } = useWallet()
-  const [active, setActive] = useState<NavKey>('dashboard')
+  const [active, setActive] = useState<NavKey>(initialActive ?? 'dashboard')
   const [showSendModal, setShowSendModal] = useState(false)
 
   const [email, setEmail] = useState<string | null>(null)
@@ -469,6 +471,7 @@ export default function PaymentDashboard() {
       { key: 'dashboard' as const, label: 'Dashboard', icon: Home },
       { key: 'payments' as const, label: 'Payments', icon: CreditCard },
       { key: 'deposits' as const, label: 'Deposits', icon: PiggyBank },
+      { key: 'jackpot' as const, label: 'Social Jackpot', icon: Trophy },
       { key: 'receipts' as const, label: 'Receipts', icon: Layers },
       { key: 'settings' as const, label: 'Settings', icon: SettingsIcon },
       { key: 'help' as const, label: 'Help', icon: HelpCircle },
@@ -479,6 +482,7 @@ export default function PaymentDashboard() {
   const content = (() => {
     if (active === 'settings') return <SettingsPage />
     if (active === 'receipts') return <ReceiptsPage />
+    if (active === 'jackpot') return <SocialJackpot />
 
     return (
       <div className="grid grid-cols-12 gap-6">
